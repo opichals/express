@@ -12,6 +12,7 @@
   * Robust routing
   * Redirection helpers
   * Dynamic view helpers
+  * Application level view options
   * Content negotiation
   * Focus on high performance
   * View rendering and partials support
@@ -42,9 +43,14 @@ The following are the major contributors of Express (in no specific order).
 
 ## Apps Using Express
 
+  * [LearnBoost](http://learnboost.com) - Online gradebook software
+  * [Markup.IO](http://markup.io/) - Draw on any website to share ideas 
   * [wtfjs](http://wtfjs.com/) - JavaScript WTFs :)
   * [Node Knockout](http://nodeknockout.com/) - node knockout competition site
   * [Node News](http://nodejs.se/) - node news aggregator
   * [Code Shelver](http://codeshelver.com/) - GitHub watch list app
   * [Clickdummy](http://clickdummy.net/) - Fast prototyping for designers
-  * [E-Resistible](e-resistible.co.uk) - Online takeaway ordering app 
+  * [E-Resistible](http://e-resistible.co.uk) - Online takeaway ordering app 
+  * [Storify](http://storify.com) - The future of publishing
+  * [Ogre](http://ogre.adc4gis.com/) - Translates spatial files into GeoJSON
+  * [Widescript](http://widescript.com/) - A digital reading app targeted to people who study or make use of reference material

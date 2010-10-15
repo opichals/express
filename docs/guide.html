@@ -2,32 +2,7 @@
 	<head>
 		<title>Express - node web framework</title>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-		<script>
-			$(function(){
-				var done;
-				$(document).scroll(function(event){
-					if (!done) {
-						$('#toc').animate({
-							top: 0
-						});
-					}
-				});
-			});
-		</script>
 		<style>
-		    #header {
-				position: absolute;
-				top: 10px;
-				left: 0;
-		        padding: 12px 0;
-				text-indent: 40px;
-				width: 100%;
-		        border-top: 1px solid rgba(0,0,0,0.7);
-		        border-bottom: 1px solid rgba(0,0,0,0.7);
-		        background: rgba(255,255,255,0.1) url(http://www.sencha.com/favicon.ico) no-repeat 15px 50%;
-				text-align: left;
-				color: #fff;
-		    }
 			#tagline {
 			  margin-left: 75px;
 			  margin-bottom: 30px;
@@ -41,8 +16,7 @@
 			  font: 14px/1.4 "Helvetica Neue", "Lucida Grande", "Arial";
 			  font-size: 14px;
 			  line-height: 1.5;
-			  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.1);
-			  -moz-text-stroke: 1px rgba(0, 0, 0, 0.1);
+			  -webkit-font-smoothing: antialiased;
 			  background: url(images/bg.jpg) 50% 0 no-repeat;
 			  color: #8b8b8b; }
 
@@ -65,13 +39,17 @@
 			  a:hover {
 			    opacity: 0.8; }
 
-			h1, h2, h3 {
+			h1, h2, h3, h4 {
 			  margin: 45px 0 0 0;
 			  color: white;
 			  text-shadow: 1px 2px 2px rgba(0,0,0,0.6); }
 
 			h3 {
 			  font-size: 18px; }
+			h4 {
+			  margin-left: 10px;
+			  font-size: 14px;
+			}
 
 			pre {
 			  margin: 20px 10px;
@@ -93,6 +71,12 @@
 			    margin: 0;
 			    padding: 2px 0;
 			    list-style: square; }
+          ul li ul {
+            margin: 0;
+            padding-left: 12px;
+          }
+
+      .man-name, #Express { display:none; }
 
 			.sect {
 			  margin-left: 40px; }
@@ -123,17 +107,18 @@
 
 			#container {
 			  margin: 0 auto;
-			  padding-top: 110px;
+			  padding-top: 80px;
 			  width: 550px; }
 
 			#toc {
 				position: fixed;
-				top: 60px;
+				top: 0;
 				left: 0;
 				margin: 0 0 0 15px;
 				padding: 15px;
 				height: 100%;
 				background: rgba(0,0,0,0.2);
+				overflow: auto;
 				border-right: 1px solid rgba(255,255,255,0.05);
 			}
 			#toc li {
@@ -171,12 +156,23 @@
 			        -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,0.4);
 			        -moz-box-shadow: 1px 1px 1px rgba(0,0,0,0.4); }
 		</style>
+		<script>
+		  $(function(){
+		    $('.section').hide();
+		    $('.toggle, a.section-title').toggle(function(){
+		      $(this).siblings('ul').fadeIn(300);
+		      return false;
+		    }, function(){
+		      $(this).siblings('ul').fadeOut(300);
+		      return false;
+		    });
+		  });
+		</script>
 	</head>
 	<body>
 		<a href='http://github.com/visionmedia/express'> 
 		  <img alt='Fork me on GitHub' id='ribbon' src='http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png' /> 
 		</a>
-		<div id="header"><strong>Sencha</strong> labs</div>
 		<div id="wrapper">
 			<div id="container"><ul id="toc">
 <li><a href="#Installation">Installation</a></li>
@@ -186,34 +182,46 @@
 <li><a href="#Routing">Routing</a></li>
 <li><a href="#Passing-Route-Control">Passing Route Control</a></li>
 <li><a href="#Middleware">Middleware</a></li>
+<li><a href="#Route-Middleware">Route Middleware</a></li>
+<li><a href="#HTTP-Methods">HTTP Methods</a></li>
 <li><a href="#Error-Handling">Error Handling</a></li>
 <li><a href="#View-Rendering">View Rendering</a></li>
 <li><a href="#View-Partials">View Partials</a></li>
 <li><a href="#Template-Engines">Template Engines</a></li>
-<li><a href="#req-header-key-defaultValue-">req.header()</a></li>
-<li><a href="#req-accepts-type-">req.accepts()</a></li>
-<li><a href="#req-param-name-">req.param()</a></li>
-<li><a href="#req-flash-type-msg-">req.flash()</a></li>
-<li><a href="#req-isXMLHttpRequest">req.isXMLHttpRequest</a></li>
-<li><a href="#res-header-key-val-">res.header()</a></li>
-<li><a href="#res-contentType-type-">res.contentType()</a></li>
-<li><a href="#res-attachment-filename-">res.attachment()</a></li>
-<li><a href="#res-sendfile-path-">res.sendfile()</a></li>
-<li><a href="#res-download-file-filename-">res.download()</a></li>
-<li><a href="#res-send-body-status-headers-status-status-">res.send()</a></li>
-<li><a href="#res-redirect-url-status-">res.redirect()</a></li>
-<li><a href="#res-render-view-options-fn-">res.render()</a></li>
-<li><a href="#res-partial-view-options-">res.partial()</a></li>
-<li><a href="#app-set-name-val-">app.set()</a></li>
-<li><a href="#app-enable-name-">app.enable()</a></li>
-<li><a href="#app-disable-name-">app.disable()</a></li>
-<li><a href="#app-configure-env-function-function-">app.configure()</a></li>
-<li><a href="#app-redirect-name-val-">app.redirect()</a></li>
-<li><a href="#app-error-function-">app.error()</a></li>
-<li><a href="#app-helpers-obj-">app.helpers()</a></li>
-<li><a href="#app-dynamicHelpers-obj-">app.dynamicHelpers()</a></li>
-<li><a href="#app-mounted-fn-">app.mounted()</a></li>
-<li><a href="#app-listen-port-host-">app.listen()</a></li>
+<li><a href="#Session-Support">Session Support</a></li>
+<li><a href="#" class="toggle">+</a> <a class="section-title" href="#">Request</a><ul class="section" id="section-Request">
+<li><a href="#req-header-key-defaultValue-">header()</a></li>
+<li><a href="#req-accepts-type-">accepts()</a></li>
+<li><a href="#req-param-name-">param()</a></li>
+<li><a href="#req-flash-type-msg-">flash()</a></li>
+<li><a href="#req-isXMLHttpRequest">isXMLHttpRequest</a></li>
+</ul></li>
+<li><a href="#" class="toggle">+</a> <a class="section-title" href="#">Response</a><ul class="section" id="section-Response">
+<li><a href="#res-header-key-val-">header()</a></li>
+<li><a href="#res-contentType-type-">contentType()</a></li>
+<li><a href="#res-attachment-filename-">attachment()</a></li>
+<li><a href="#res-sendfile-path-">sendfile()</a></li>
+<li><a href="#res-download-file-filename-">download()</a></li>
+<li><a href="#res-send-body-status-headers-status-status-">send()</a></li>
+<li><a href="#res-redirect-url-status-">redirect()</a></li>
+<li><a href="#res-cookie-name-val-options-">cookie()</a></li>
+<li><a href="#res-clearCookie-name-">clearCookie()</a></li>
+<li><a href="#res-render-view-options-fn-">render()</a></li>
+<li><a href="#res-partial-view-options-">partial()</a></li>
+</ul></li>
+<li><a href="#" class="toggle">+</a> <a class="section-title" href="#">Server</a><ul class="section" id="section-Server">
+<li><a href="#app-set-name-val-">set()</a></li>
+<li><a href="#app-enable-name-">enable()</a></li>
+<li><a href="#app-disable-name-">disable()</a></li>
+<li><a href="#app-configure-env-function-function-">configure()</a></li>
+<li><a href="#app-redirect-name-val-">redirect()</a></li>
+<li><a href="#app-error-function-">error()</a></li>
+<li><a href="#app-helpers-obj-">helpers()</a></li>
+<li><a href="#app-dynamicHelpers-obj-">dynamicHelpers()</a></li>
+<li><a href="#app-mounted-fn-">mounted()</a></li>
+<li><a href="#app-register-ext-exports-">register()</a></li>
+<li><a href="#app-listen-port-host-">listen()</a></li>
+</ul></li>
 </ul>
 				<a href='http://github.com/visionmedia/express' id='logo'>Express</a> 
 				<p id="tagline">
@@ -227,6 +235,10 @@
 					<li><a href="migrate.html">1.x Migration</a></li>
 				</ul>
 <div class='mp'>
+<h2 id="Express">Express</h2>
+<p class="man-name">
+  <code>guide</code>
+</p>
 <h3 id="Installation">Installation</h3>
 
 <p>curl:</p>
@@ -274,18 +286,18 @@ Note the use of <em>app.router</em>, which can (optionally) be used to mount the
 otherwise the first call to <em>app.{get,put,del,post}()</em> will mount the routes.</p>
 
 <pre><code>app.configure(function(){
-    app.use(connect.methodOverride());
-    app.use(connect.bodyDecoder());
+    app.use(express.methodOverride());
+    app.use(express.bodyDecoder());
     app.use(app.router);
-    app.use(connect.staticProvider(__dirname + '/public'));
+    app.use(express.staticProvider(__dirname + '/public'));
 });
 
 app.configure('development', function(){
-    app.use(connect.errorHandler({ dumpExceptions: true, showStack: true }));
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 app.configure('production', function(){
-    app.use(connect.errorHandler());
+    app.use(express.errorHandler());
 });
 </code></pre>
 
@@ -304,11 +316,12 @@ app.configure('production', function(){
 });
 </code></pre>
 
-<p>To alter the environment we can set the <em>CONNECT_ENV</em> environment variable,
-or more specifically <em>EXPRESS_ENV</em>, for example:</p>
+<p>To alter the environment we can set the <em>NODE_ENV</em> environment variable, for example:</p>
 
-<pre><code>$ EXPRESS_ENV=production node app.js
+<pre><code>$ NODE_ENV=production node app.js
 </code></pre>
+
+<p>This is <em>very</em> important, as many caching mechanisms are <em>only enabled</em> when in production.</p>
 
 <h3 id="Settings">Settings</h3>
 
@@ -319,6 +332,9 @@ or more specifically <em>EXPRESS_ENV</em>, for example:</p>
 <li><em>home</em> Application base path used for <em>res.redirect()</em> and transparently handling mounted apps.</li>
 <li><em>views</em> Root views directory defaulting to <strong>CWD/views</strong></li>
 <li><em>view engine</em> Default view engine name for views rendered without extensions</li>
+<li><em>view options</em> An object specifying global view options</li>
+<li><em>partials</em> Root view partials directory defaulting to <em>views</em>/partials.</li>
+<li><em>stream threshold</em> Bytesize indicating when a file should be streamed for <em>res.sendfile()</em> using <em>fs.ReadStream()</em> and <em>sys.pump()</em>.</li>
 </ul>
 
 
@@ -396,9 +412,9 @@ may consume:</p>
 
 <p>We may pass control to the next <em>matching</em> route, by calling the <em>third</em> argument,
 the <em>next()</em> function. When a match cannot be made, control is passed back to Connect,
-and middleware continue to be invoked.</p>
+and middleware continue to be invoked. The same is true for several routes which have the same path defined, they will simply be executed in order until one does <em>not</em> call <em>next()</em>.</p>
 
-<pre><code>app.get('/users/:id?', function(req, res){
+<pre><code>app.get('/users/:id?', function(req, res, next){
     var id = req.params.id;
     if (id) {
         // do something
@@ -414,21 +430,154 @@ app.get('/users', function(req, res){
 
 <h3 id="Middleware">Middleware</h3>
 
-<p>The Express <em>Plugin</em> is no more! middleware via <a href="http://github.com/extjs/Connect">Connect</a> can be
+<p>Middleware via <a href="http://github.com/senchalabs/connect">Connect</a> can be
 passed to <em>express.createServer()</em> as you would with a regular Connect server. For example:</p>
 
-<pre><code>var connect = require('connect'),
-    express = require('express');
+<pre><code>  var express = require('express');
 
 var app = express.createServer(
-    connect.logger(),
-    connect.bodyDecoder()
-);
+    express.logger(),
+    express.bodyDecoder()
+  );
 </code></pre>
 
 <p>Alternatively we can <em>use()</em> them which is useful when adding middleware within <em>configure()</em> blocks:</p>
 
-<pre><code>app.use(connect.logger({ format: ':method :uri' }));
+<pre><code>app.use(express.logger({ format: ':method :uri' }));
+</code></pre>
+
+<p>Typically with connect middleware you would <em>require('connect')</em> like so:</p>
+
+<pre><code>var connect = require('connect');
+app.use(connect.logger());
+</code></pre>
+
+<p>This is somewhat annoying, so express re-exports these middleware properties, however they are <em>identical</em>:</p>
+
+<pre><code>app.use(express.logger());
+</code></pre>
+
+<h3 id="Route-Middleware">Route Middleware</h3>
+
+<p>Routes may utilize route-specific middleware by passing one or more additional callbacks (or arrays) to the method. This feature is extremely useful for restricting access, loading data used by the route etc.</p>
+
+<p>Typically async data retrieval might look similar to below, where we take the <em>:id</em> parameter, and attempt loading a user.</p>
+
+<pre><code>app.get('/user/:id', function(req, res, next){
+    loadUser(req.params.id, function(err, user){
+        if (err) return next(err);
+        res.send('Viewing user ' + user.name);
+    });
+});
+</code></pre>
+
+<p>To keep things DRY and to increase readability we can apply this logic within a middleware. As you can see below, abstracting this logic into middleware allows us to reuse it, and clean up our route at the same time.</p>
+
+<pre><code>function loadUser(req, res, next) {
+    // You would fetch your user from the db
+    var user = users[req.params.id];
+    if (user) {
+        req.user = user;
+        next();
+    } else {
+        next(new Error('Failed to load user ' + req.params.id));
+    }
+}
+
+app.get('/user/:id', loadUser, function(req, res){
+    res.send('Viewing user ' + req.user.name);
+});
+</code></pre>
+
+<p>Multiple route middleware can be applied, and will be executed sequentially to apply further logic such as restricting access to a user account. In the example below only the authenticated user may edit his/her account.</p>
+
+<pre><code>function andRestrictToSelf(req, res, next) {
+    req.authenticatedUser.id == req.user.id
+        ? next()
+        : next(new Error('Unauthorized'));
+}
+
+app.get('/user/:id/edit', loadUser, andRestrictToSelf, function(req, res){
+    res.send('Editing user ' + req.user.name);
+});
+</code></pre>
+
+<p>Keeping in mind that middleware are simply functions, we can define function that <em>returns</em> the middleware in order to create a more expressive and flexible solution as shown below.</p>
+
+<pre><code>function andRestrictTo(role) {
+    return function(req, res, next) {
+      req.authenticatedUser.role == role
+          ? next()
+          : next(new Error('Unauthorized'));
+    }
+}
+
+app.del('/user/:id', loadUser, andRestrictTo('admin'), function(req, res){
+    res.send('Deleted user ' + req.user.name);
+});
+</code></pre>
+
+<p>Commonly used "stacks" of middleware can be passed as an array (<em>applied recursively</em>), which can be mixed and matched to any degree.</p>
+
+<pre><code>var a = [middleware1, middleware2]
+  , b = [middleware3, middleware4]
+  , all = [a, b];
+
+app.get('/foo', a, function(){});
+app.get('/bar', a, function(){});
+
+app.get('/', a, middleware3, middleware4, function(){});
+app.get('/', a, b, function(){});
+app.get('/', all, function(){});
+</code></pre>
+
+<p>For this example in full, view the <a href="http://github.com/visionmedia/express/blob/master/examples/route-middleware/app.js">route middleware example</a> in the repository.</p>
+
+<h3 id="HTTP-Methods">HTTP Methods</h3>
+
+<p>We have seen <em>app.get()</em> a few times, however Express also exposes other familiar HTTP verbs in the same manor, such as <em>app.post()</em>, <em>app.del()</em>, etc.</p>
+
+<p> A common example for <em>POST</em> usage, is when "submitting" a form. Below we simply set our form method to "post" in our html, and control will be given to the route we have defined below it.</p>
+
+<pre><code> &lt;form method="post" action="/"&gt;
+     &lt;input type="text" name="user[name]" /&gt;
+     &lt;input type="text" name="user[email]" /&gt;
+     &lt;input type="submit" value="Submit" /&gt;
+ &lt;/form&gt;
+</code></pre>
+
+<p>By default Express does not know what to do with this request body, so we should add the <em>bodyDecoder</em> middleware, which will parse <em>application/x-www-form-urlencoded</em> request bodies and place the variables in <em>req.body</em>. We can do this by "using" the middleware as shown below:</p>
+
+<pre><code>app.use(express.bodyDecoder());
+</code></pre>
+
+<p>Our route below will now have access to the <em>req.body.user</em> object which will contain the <em>name</em> and <em>email</em> properties when defined.</p>
+
+<pre><code>app.post('/', function(req, res){
+    console.log(req.body.user);
+    res.redirect('back');
+});
+</code></pre>
+
+<p>When using methods such as <em>PUT</em> with a form, we can utilize a hidden input named <em>_method</em>, which can be used to alter the HTTP method. To do so we first need the <em>methodOverride</em> middleware, which should be placed below <em>bodyDecoder</em> so that it can utilize it's <em>req.body</em> containing the form values.</p>
+
+<pre><code>app.use(express.bodyDecoder());
+app.use(express.methodOverride());
+</code></pre>
+
+<p>The reason that these are not always defaults, is simply because these are not required for Express to be fully functional. Depending on the needs of your application, you may not need these at all, your methods such as <em>PUT</em> and <em>DELETE</em> can still be accessed by clients which can use them directly, although <em>methodOverride</em> provides a great solution for forms. Below shows what the usage of <em>PUT</em> might look like:</p>
+
+<pre><code>&lt;form method="post" action="/"&gt;
+  &lt;input type="hidden" name="_method" value="put" /&gt;
+  &lt;input type="text" name="user[name]" /&gt;
+  &lt;input type="text" name="user[email]" /&gt;
+  &lt;input type="submit" value="Submit" /&gt;    
+&lt;/form&gt;
+
+app.put('/', function(){
+    console.log(req.body.user);
+    res.redirect('back');
+});
 </code></pre>
 
 <h3 id="Error-Handling">Error Handling</h3>
@@ -458,6 +607,11 @@ app.get('/500', function(req, res){
 Here we check for an instanceof <em>NotFound</em> and show the
 404 page, or we pass on to the next error handler.</p>
 
+<p>Note that these handlers can be defined anywhere, as they
+will be placed below the route handlers on <em>listen()</em>. This
+allows for definition within <em>configure()</em> blocks so we can
+handle exceptions in different ways based on the environment.</p>
+
 <pre><code>app.error(function(err, req, res, next){
     if (err instanceof NotFound) {
         res.render('404.jade');
@@ -483,13 +637,13 @@ this demo, however you can choose whatever you like</p>
 to report on exceptions. For example if we wish to output exceptions
 in "development" mode to <em>stderr</em> we can use:</p>
 
-<pre><code>app.use(connect.errorHandler({ dumpExceptions: true }));
+<pre><code>app.use(express.errorHandler({ dumpExceptions: true }));
 </code></pre>
 
 <p>Also during development we may want fancy html pages to show exceptions
 that are passed or thrown, so we can set <em>showStack</em> to true:</p>
 
-<pre><code>app.use(connect.errorHandler({ showStack: true, dumpExceptions: true }));
+<pre><code>app.use(express.errorHandler({ showStack: true, dumpExceptions: true }));
 </code></pre>
 
 <p>The <em>errorHandler</em> middleware also responds with <em>json</em> if <em>Accept: application/json</em>
@@ -499,9 +653,8 @@ is present, which is useful for developing apps that rely heavily on client-side
 
 <p>View filenames take the form <em>Express</em>.<em>ENGINE</em>, where <em>ENGINE</em> is the name
 of the module that will be required. For example the view <em>layout.ejs</em> will
-tell the view system to <em>require('ejs')</em>, the module being loaded must (currently)
-export the method <em>exports.render(str, options)</em> to comply with Express, however
-with will likely be extensible in the future.</p>
+tell the view system to <em>require('ejs')</em>, the module being loaded must export the method <em>exports.render(str, options)</em> to comply with Express, however
+<em>app.register()</em> can be used to map engines to file extensions, so that for example "foo.html" can be rendered by jade.</p>
 
 <p>Below is an example using <a href="http://github.com/visionmedia/haml.js">Haml.js</a> to render <em>index.html</em>,
 and since we do not use <em>layout: false</em> the rendered contents of <em>index.html</em> will be passed as
@@ -536,6 +689,41 @@ mix and match template engines:</p>
 <pre><code>res.render('another-page.ejs');
 </code></pre>
 
+<p>Express also provides the <em>view options</em> setting, which is applied each time a view is rendered, so for example if you rarely use layouts you may set:</p>
+
+<pre><code>app.set('view options', {
+    layout: false
+});
+</code></pre>
+
+<p>Which can then be overridden within the <code>res.render()</code> call if need be:</p>
+
+<pre><code>res.render('myview.ejs', { layout: true });
+</code></pre>
+
+<p>When an alternate layout is required, we may also specify a path. For example if we have <em>view engine</em> set to <em>jade</em> and a file named <em>./views/mylayout.jade</em> we can simply pass:</p>
+
+<pre><code>res.render('page', { layout: 'mylayout' });
+</code></pre>
+
+<p>Otherwise we must specify the extension:</p>
+
+<pre><code>res.render('page', { layout: 'mylayout.jade' });
+</code></pre>
+
+<p>These paths may also be absolute:</p>
+
+<pre><code>res.render('page', { layout: __dirname + '/../../mylayout.jade' });
+</code></pre>
+
+<p>A good example of this is specifying custom <em>ejs</em> opening and closing tags:</p>
+
+<pre><code>app.set('view options', {
+    open: '{{',
+    close: '}}'
+});
+</code></pre>
+
 <h3 id="View-Partials">View Partials</h3>
 
 <p>The Express view system has built-in support for partials and collections, which are
@@ -554,7 +742,7 @@ however if we wished we could use an ejs partial, within a haml view for example
 <p>And once again even further, when rendering a collection we can simply pass
 an array, if no other options are desired:</p>
 
-<pre><code>partial('comments', comments);
+<pre><code>partial('comment', comments);
 </code></pre>
 
 <p>When using the partial collection support a few "magic" variables are provided
@@ -563,20 +751,67 @@ for free:</p>
 <ul>
 <li><em>firstInCollection</em>  True if this is the first object</li>
 <li><em>indexInCollection</em>  Index of the object in the collection</li>
-<li>_lastInCollection _  True if this is the last object</li>
+<li><em>lastInCollection</em>  True if this is the last object</li>
+<li><em>collectionLength</em>  Length of the collection</li>
 </ul>
 
+
+<p>For documentation on altering the object name view <a href="http://expressjs.com/guide.html#res-partial-view-options-">res.partial()</a>.</p>
 
 <h3 id="Template-Engines">Template Engines</h3>
 
 <p>Below are a few template engines commonly used with Express:</p>
 
 <ul>
-<li><a href="http://github.com/visionmedia/jade">Jade</a> haml.js successor</li>
-<li><a href="http://github.com/visionmedia/haml.js">Haml</a> indented templates</li>
+<li><a href="http://jade-lang.com">Jade</a> haml.js successor</li>
+<li><a href="http://github.com/visionmedia/haml.js">Haml</a> pythonic indented templates</li>
 <li><a href="http://github.com/visionmedia/ejs">EJS</a> Embedded JavaScript</li>
+<li><a href="http://github.com/mauricemach/coffeekup">CoffeeKup</a> CoffeeScript based templating</li>
 </ul>
 
+
+<h3 id="Session-Support">Session Support</h3>
+
+<p>Sessions support can be added by using Connect's <em>session</em> middleware. To do so we also need the <em>cookieDecoder</em> middleware place above it, which will parse and populate cookie data to <em>req.cookies</em>.</p>
+
+<pre><code>app.use(express.cookieDecoder());
+app.use(express.session());
+</code></pre>
+
+<p>By default the <em>session</em> middleware uses the memory store bundled with Connect, however many implementations exist. For example <a href="http://github.com/visionmedia/connect-redis">connect-redis</a> supplies a <a href="http://code.google.com/p/redis/">Redis</a> session store and can be used as shown below:</p>
+
+<pre><code>var RedisStore = require('connect-redis');
+app.use(express.cookieDecoder());
+app.use(express.session({ store: new RedisStore }));
+</code></pre>
+
+<p>Now the <em>req.session</em> and <em>req.sessionStore</em> properties will be accessible to all routes and subsequent middleware. Properties on <em>req.session</em> are automatically saved on a response, so for example if we wish to shopping cart data:</p>
+
+<pre><code>var RedisStore = require('connect-redis');
+app.use(express.cookieDecoder());
+app.use(express.session({ store: new RedisStore }));
+app.use(express.bodyDecoder());
+
+app.post('/add-to-cart', function(req, res){
+  // Perhaps we posted several items with a form
+  // (use the bodyDecoder() middleware for this)
+  var items = req.body.items;
+  req.session.items = items;
+  res.redirect('back');
+});
+
+app.get('/add-to-cart', function(req, res){
+  // When redirected back to GET /add-to-cart
+  // we could check req.session.items &amp;&amp; req.session.items.length
+  // to print out a message
+  if (req.session.items &amp;&amp; req.session.items.length) {
+    req.flash('info', 'You have %s items in your cart', req.session.items.length);
+  }
+  res.render('shopping-cart');
+});
+</code></pre>
+
+<p>The <em>req.session</em> object also has methods such as <em>Session#touch()</em>, <em>Session#destroy()</em>, <em>Session#regenerate()</em> among others to maintain and manipulate sessions. For more information view the <a href="http://senchalabs.github.com/connect/session.html">Connect Session</a> documentation.</p>
 
 <h3 id="req-header-key-defaultValue-">req.header(key[, defaultValue])</h3>
 
@@ -625,7 +860,7 @@ req.accepts('png');
 
 <p>To utilize urlencoded request bodies, <em>req.body</em>
 should be an object. This can be done by using
-the <em>connect.bodyDecoder</em> middleware.</p>
+the <em>express.bodyDecoder</em> middleware.</p>
 
 <h3 id="req-flash-type-msg-">req.flash(type[, msg])</h3>
 
@@ -644,6 +879,11 @@ req.flash('info');
 
 req.flash();
 // =&gt; { error: ['email delivery failed'], info: [] }
+</code></pre>
+
+<p>Flash notification message may also utilize formatters, by default only the %s string formatter is available:</p>
+
+<pre><code>req.flash('info', 'email delivery to _%s_ from _%s_ failed.', toUser, fromUser);
 </code></pre>
 
 <h3 id="req-isXMLHttpRequest">req.isXMLHttpRequest</h3>
@@ -692,10 +932,18 @@ res.header('Content-Length');
 <pre><code>res.sendfile('path/to/my.file');
 </code></pre>
 
-<p>This is <em>not</em> a substitution for Connect's <em>staticProvider</em> middleware, it does not
-support HTTP caching, and does not perform any security checks. This method is utilized
-by <em>res.download()</em> to transfer static files, and allows you do to so from outside of
-the public directory, so suitable security checks should be applied.</p>
+<p>This method accepts a callback which when given will be called on an exception, as well as when the transfer has completed. When a callback is not given, and the file has <strong>not</strong> been streamed, <em>next(err)</em> will be called on an exception.</p>
+
+<pre><code>res.sendfile(path, function(err, path){
+  if (err) {
+    // handle the error
+  } else {
+    console.log('transferred %s', path);
+  }
+});
+</code></pre>
+
+<p>When the filesize exceeds the <em>stream threshold</em> (defaulting to 32k), the file will be streamed using <em>fs.ReadStream</em> and <em>sys.pump()</em>.</p>
 
 <h3 id="res-download-file-filename-">res.download(file[, filename])</h3>
 
@@ -717,7 +965,8 @@ res.sendfile(file);
 objects to respond with json, strings for html, arbitrary _Buffer_s or numbers for status
 code based responses. The following are all valid uses:</p>
 
-<pre><code> res.send(new Buffer('wahoo'));
+<pre><code> res.send(); // 204
+ res.send(new Buffer('wahoo'));
  res.send({ some: 'json' });
  res.send('&lt;p&gt;some html&lt;/p&gt;');
  res.send('Sorry, cant find that', 404);
@@ -744,6 +993,30 @@ res.redirect('back');
 The <em>back</em> map checks the <em>Referrer</em> and <em>Referer</em> headers, while <em>home</em> utilizes
 the "home" setting and defaults to "/".</p>
 
+<h3 id="res-cookie-name-val-options-">res.cookie(name, val[, options])</h3>
+
+<p>Sets the given cookie <em>name</em> to <em>val</em>, with <em>options</em> such as "httpOnly: true", "expires", "secure" etc.</p>
+
+<pre><code>// "Remember me" for 15 minutes 
+res.cookie('rememberme', 'yes', { expires: new Date(Date.now() + 900000), httpOnly: true });
+</code></pre>
+
+<p>To parse incoming <em>Cookie</em> headers, use the <em>cookieDecoder</em> middleware, which provides the <em>req.cookies</em> object:</p>
+
+<pre><code>app.use(express.cookieDecoder());
+
+app.get('/', function(req, res){
+    // use req.cookies.rememberme
+});
+</code></pre>
+
+<h3 id="res-clearCookie-name-">res.clearCookie(name)</h3>
+
+<p>Clear cookie <em>name</em> by setting "expires" far in the past.</p>
+
+<pre><code>res.clearCookie('rememberme');
+</code></pre>
+
 <h3 id="res-render-view-options-fn-">res.render(view[, options[, fn]])</h3>
 
 <p>Render <em>view</em> with the given <em>options</em> and optional callback <em>fn</em>.
@@ -754,9 +1027,11 @@ automatically, however otherwise a response of <em>200</em> and <em>text/html</e
  both <a href="http://github.com/visionmedia/haml.js">haml</a> and <a href="http://github.com/visionmedia/jade">jade</a> accept all:</p>
 
 <ul>
-<li><em>context|scope</em>   Template evaluation context (<em>this</em>)</li>
+<li><em>scope</em>           Template evaluation context (value of <em>this</em>)</li>
 <li><em>locals</em>          Object containing local variables</li>
 <li><em>debug</em>           Output debugging information</li>
+<li><em>status</em>          Response status code, defaults to 200</li>
+<li><em>headers</em>         Response headers object</li>
 </ul>
 
 
@@ -782,7 +1057,9 @@ For example <em>video.html</em> will have a object <em>video</em> available to i
 <p>The following are equivalent, and the name of collection value when passed
 to the partial will be <em>movie</em> as derived from the name.</p>
 
-<pre><code>partial('movie.jade', { collection: movies });
+<pre><code>partial('theatre/movie.jade', { collection: movies });
+partial('theatre/movie.jade', movies);
+partial('movie.jade', { collection: movies });
 partial('movie.jade', movies);
 partial('movie', movies);
 // In view: movie.director
@@ -936,6 +1213,34 @@ blog.mounted(function(parent){
 });
 
 app.use(blog);
+</code></pre>
+
+<h3 id="app-register-ext-exports-">app.register(ext, exports)</h3>
+
+<p>Register the given template engine <em>exports</em>
+as <em>ext</em>. For example we may wish to map ".html"
+files to jade:</p>
+
+<pre><code> app.register('.html', require('jade'));
+</code></pre>
+
+<p>This is also useful for libraries that may not
+match extensions correctly. For example my haml.js
+library is installed from npm as "hamljs" so instead
+of layout.hamljs, we can register the engine as ".haml":</p>
+
+<pre><code> app.register('.haml', require('haml-js'));
+</code></pre>
+
+<p>For engines that do not comply with the Express
+specification, we can also wrap their api this way.</p>
+
+<pre><code> app.register('.foo', {
+     render: function(str, options) {
+         // perhaps their api is
+         // return foo.toHTML(str, options);
+     }
+ });
 </code></pre>
 
 <h3 id="app-listen-port-host-">app.listen([port[, host]])</h3>
