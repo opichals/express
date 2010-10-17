@@ -74,6 +74,8 @@ To alter the environment we can set the _NODE_ENV_ environment variable, for exa
 
     $ NODE_ENV=production node app.js
 
+This is _very_ important, as many caching mechanisms are _only enabled_ when in production.
+
 ### Settings
 
 Express supports the following settings out of the box:
@@ -452,7 +454,7 @@ however if we wished we could use an ejs partial, within a haml view for example
 And once again even further, when rendering a collection we can simply pass
 an array, if no other options are desired:
 
-    partial('comments', comments);
+    partial('comment', comments);
 
 When using the partial collection support a few "magic" variables are provided
 for free:
@@ -460,6 +462,9 @@ for free:
   * _firstInCollection_  True if this is the first object
   * _indexInCollection_  Index of the object in the collection
   * _lastInCollection_  True if this is the last object
+  * _collectionLength_  Length of the collection
+
+For documentation on altering the object name view [res.partial()](http://expressjs.com/guide.html#res-partial-view-options-).
 
 ### Template Engines
 
@@ -468,6 +473,7 @@ Below are a few template engines commonly used with Express:
   * [Jade](http://jade-lang.com) haml.js successor
   * [Haml](http://github.com/visionmedia/haml.js) pythonic indented templates
   * [EJS](http://github.com/visionmedia/ejs) Embedded JavaScript
+  * [CoffeeKup](http://github.com/mauricemach/coffeekup) CoffeeScript based templating
 
 ### Session Support
 
@@ -485,9 +491,9 @@ By default the _session_ middleware uses the memory store bundled with Connect, 
 Now the _req.session_ and _req.sessionStore_ properties will be accessible to all routes and subsequent middleware. Properties on _req.session_ are automatically saved on a response, so for example if we wish to shopping cart data:
 
     var RedisStore = require('connect-redis');
+    app.use(express.bodyDecoder());
     app.use(express.cookieDecoder());
     app.use(express.session({ store: new RedisStore }));
-    app.use(express.bodyDecoder());
 
     app.post('/add-to-cart', function(req, res){
       // Perhaps we posted several items with a form
@@ -508,6 +514,10 @@ Now the _req.session_ and _req.sessionStore_ properties will be accessible to al
     });
 
 The _req.session_ object also has methods such as _Session#touch()_, _Session#destroy()_, _Session#regenerate()_ among others to maintain and manipulate sessions. For more information view the [Connect Session](http://senchalabs.github.com/connect/session.html) documentation.
+
+### Migration Guide
+
+ Pre-beta Express developers may reference the [Migration Guide](migrate.html) to get up to speed on how to upgrade your application.
 
 ### req.header(key[, defaultValue])
 
@@ -724,6 +734,8 @@ to the view as a local variable.
 The following are equivalent, and the name of collection value when passed
 to the partial will be _movie_ as derived from the name.
 
+    partial('theatre/movie.jade', { collection: movies });
+    partial('theatre/movie.jade', movies);
     partial('movie.jade', { collection: movies });
     partial('movie.jade', movies);
     partial('movie', movies);
