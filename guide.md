@@ -42,19 +42,19 @@ Note the use of _app.router_, which can (optionally) be used to mount the applic
 otherwise the first call to _app.{get,put,del,post}()_ will mount the routes.
 
     app.configure(function(){
-		app.use(express.methodOverride());
-		app.use(express.bodyDecoder());
-		app.use(app.router);
-		app.use(express.staticProvider(__dirname + '/public'));
-	});
+  		app.use(express.methodOverride());
+  		app.use(express.bodyDecoder());
+  		app.use(app.router);
+  		app.use(express.staticProvider(__dirname + '/public'));
+  	});
 	
-	app.configure('development', function(){
-		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-	});
+  	app.configure('development', function(){
+  		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  	});
 	
-	app.configure('production', function(){
-		app.use(express.errorHandler());
-	});
+  	app.configure('production', function(){
+  		app.use(express.errorHandler());
+  	});
 
 For internal and arbitrary settings Express provides the _set(key[, val])_, _enable(key)_, _disable(key)_ methods:
 
@@ -96,8 +96,8 @@ can be done by defining the route below. The values associated to the named plac
 are available as `req.params`.
 
     app.get('/user/:id', function(req, res){
-		res.send('user ' + req.params.id);
-	});
+  		res.send('user ' + req.params.id);
+  	});
 
 A route is simple a string which is compiled to a _RegExp_ internally. For example
 when _/user/:id_ is compiled, a simplified version of the regexp may look similar to:
@@ -153,6 +153,19 @@ may consume:
 	 /products.xml
 	 /products
 
+For example we can __POST__ some json, and echo the json back using the _bodyDecoder_ middleware which will parse json request bodies (as well as others), and place the result in _req.body_:
+
+    var express = require('express')
+      , app = express.createServer();
+
+    app.use(express.bodyDecoder());
+
+    app.post('/', function(req, res){
+      res.send(req.body);
+    });
+
+    app.listen(3000);
+
 ### Passing Route Control
 
 We may pass control to the next _matching_ route, by calling the _third_ argument,
@@ -171,6 +184,40 @@ and middleware continue to be invoked. The same is true for several routes which
 	app.get('/users', function(req, res){
 		// do something else
 	});
+
+Express 1.0 also introduces the _all()_ method, which provides a route callback matching any HTTP method. This is useful in many ways, one example being the loading of resources before executing subsequent routes as shown below:
+
+    var express = require('express')
+      , app = express.createServer();
+
+    var users = [{ name: 'tj' }];
+
+    app.all('/user/:id/:op?', function(req, res, next){
+      req.user = users[req.params.id];
+      if (req.user) {
+        next();
+      } else {
+        next(new Error('cannot find user ' + req.params.id));
+      }
+    });
+
+    app.get('/user/:id', function(req, res){
+      res.send('viewing ' + req.user.name);
+    });
+
+    app.get('/user/:id/edit', function(req, res){
+      res.send('editing ' + req.user.name);
+    });
+
+    app.put('/user/:id', function(req, res){
+      res.send('updating ' + req.user.name);
+    });
+
+    app.get('*', function(req, res){
+      res.send('what???', 404);
+    });
+
+    app.listen(3000); 
 
 ### Middleware
 
@@ -474,6 +521,7 @@ Below are a few template engines commonly used with Express:
   * [Haml](http://github.com/visionmedia/haml.js) pythonic indented templates
   * [EJS](http://github.com/visionmedia/ejs) Embedded JavaScript
   * [CoffeeKup](http://github.com/mauricemach/coffeekup) CoffeeScript based templating
+  * [jQuery Templates](https://github.com/kof/node-jqtpl) for node
 
 ### Session Support
 
@@ -772,7 +820,8 @@ automatically, however otherwise a response of _200_ and _text/html_ is given.
 Render _view_ partial with the given _options_. This method is always available
 to the view as a local variable.
 
-- _as_ Variable name for each _collection_ value, defaults to the view name.
+- _object_ the object named by _as_ or derived from the view name
+- _as_ Variable name for each _collection_ or _object_ value, defaults to the view name.
   * as: 'something' will add the _something_ local variable
   * as: this will use the collection value as the template context
   * as: global will merge the collection value's properties with _locals_
@@ -804,8 +853,27 @@ of _movie.director_ we could use _this.director_.
 Another alternative is to "explode" the properties of the collection item into
 pseudo globals (local variables) by using _as: global_, which again is syntactic sugar:
 
-    partials('movie', { collection: movies, as: global });
+    partial('movie', { collection: movies, as: global });
     // In view: director
+
+This same logic applies to a single partial object usage:
+
+    partial('movie', { object: movie, as: this });
+    // In view: this.director
+
+    partial('movie', { object: movie, as: global });
+    // In view: director
+
+    partial('movie', { object: movie, as: 'video' });
+    // In view: video.director
+
+    partial('movie', { object: movie });
+    // In view: movie.director
+
+When a non-collection (does _not_ have _.length_) is passed as the second argument, it is assumed to be the _object_, after which the object's local variable name is derived from the view name:
+
+    partial('movie', movie);
+    // => In view: movie.director
 
 ### app.set(name[, val])
 
@@ -814,6 +882,11 @@ get the value of _name_ when _val_ is not present:
 
     app.set('views', __dirname + '/views');
     app.set('views');
+    // => ...path...
+
+Alternatively you may simply access the settings via _app.settings_:
+
+    app.settings.views
     // => ...path...
 
 ### app.enable(name)
