@@ -9,12 +9,6 @@ npm:
 
     $ npm install express
 
-git clone, first update the submodules:
-
-    $ git submodule update --init
-    $ make install
-    $ make install-support
-
 ### Creating An Application
 
 The _express.Server_ now inherits from _http.Server_, however
@@ -42,19 +36,21 @@ Note the use of _app.router_, which can (optionally) be used to mount the applic
 otherwise the first call to _app.{get,put,del,post}()_ will mount the routes.
 
     app.configure(function(){
-  		app.use(express.methodOverride());
-  		app.use(express.bodyDecoder());
-  		app.use(app.router);
-  		app.use(express.staticProvider(__dirname + '/public'));
-  	});
-	
-  	app.configure('development', function(){
-  		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-  	});
-	
-  	app.configure('production', function(){
-  		app.use(express.errorHandler());
-  	});
+    	app.use(express.methodOverride());
+    	app.use(express.bodyDecoder());
+    	app.use(app.router);
+    });
+
+    app.configure('development', function(){
+    	app.use(express.staticProvider(__dirname + '/public'));
+    	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+    });
+
+    app.configure('production', function(){
+      var oneYear = 31557600000;
+    	app.use(express.staticProvider({ root: __dirname + '/public', maxAge: oneYear }));
+    	app.use(express.errorHandler());
+    });
 
 For internal and arbitrary settings Express provides the _set(key[, val])_, _enable(key)_, _disable(key)_ methods:
 
@@ -521,27 +517,28 @@ Below are a few template engines commonly used with Express:
   * [Haml](http://github.com/visionmedia/haml.js) pythonic indented templates
   * [EJS](http://github.com/visionmedia/ejs) Embedded JavaScript
   * [CoffeeKup](http://github.com/mauricemach/coffeekup) CoffeeScript based templating
+  * [Eco](http://github.com/sstephenson/eco) Embedded CoffeeScript
   * [jQuery Templates](https://github.com/kof/node-jqtpl) for node
 
 ### Session Support
 
-Sessions support can be added by using Connect's _session_ middleware. To do so we also need the _cookieDecoder_ middleware place above it, which will parse and populate cookie data to _req.cookies_.
+Sessions support can be added by using Connect's _session_ middleware. To do so we also need the _cookieDecoder_ middleware place above it, which will parse and populate cookie data to _req.cookies_. The session middleware requires only a `secret`.
 
     app.use(express.cookieDecoder());
-    app.use(express.session());
+    app.use(express.session({ secret: 'keyboard cat' }));
 
 By default the _session_ middleware uses the memory store bundled with Connect, however many implementations exist. For example [connect-redis](http://github.com/visionmedia/connect-redis) supplies a [Redis](http://code.google.com/p/redis/) session store and can be used as shown below:
 
     var RedisStore = require('connect-redis');
     app.use(express.cookieDecoder());
-    app.use(express.session({ store: new RedisStore }));
+    app.use(express.session({ store: new RedisStore, secret: 'keyboard cat' }));
 
 Now the _req.session_ and _req.sessionStore_ properties will be accessible to all routes and subsequent middleware. Properties on _req.session_ are automatically saved on a response, so for example if we wish to shopping cart data:
 
     var RedisStore = require('connect-redis');
     app.use(express.bodyDecoder());
     app.use(express.cookieDecoder());
-    app.use(express.session({ store: new RedisStore }));
+    app.use(express.session({ store: new RedisStore, secret: 'keyboard cat' }));
 
     app.post('/add-to-cart', function(req, res){
       // Perhaps we posted several items with a form
@@ -662,7 +659,7 @@ the _express.bodyDecoder_ middleware.
 
 ### req.flash(type[, msg])
 
-Queue flash _msg_ of the given _type_.
+Queue flash _msg_ of the given _type_. These messages are stored in the session (thus requiring the `session` middleware), enabling them to span one or more requests before flushing.
 
     req.flash('info', 'email sent');
     req.flash('error', 'email delivery failed');
@@ -681,6 +678,8 @@ Queue flash _msg_ of the given _type_.
 Flash notification message may also utilize formatters, by default only the %s string formatter is available:
 
     req.flash('info', 'email delivery to _%s_ from _%s_ failed.', toUser, fromUser);
+
+For HTML flash message check out the [express-contrib](https://github.com/visionmedia/express-contrib) library.
 
 ### req.isXMLHttpRequest
 
